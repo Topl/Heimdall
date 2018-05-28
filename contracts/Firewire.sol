@@ -149,6 +149,7 @@ contract Firewire {
 
     function payout() public only_owner {
         msg.sender.transfer(users[owner].balance);
+        users[owner].balance = 0;
     }
 
     // NEED TO IMPLEMENT UPGRADABILITY
