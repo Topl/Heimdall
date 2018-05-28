@@ -1,6 +1,6 @@
 //////////// GLOBALS ////////////
 transfers = {};
-owner = msg.sender; // init owner as contract creator
+owner = contract.owner; // init owner as contract creator (not how this works either)
 
 //////////// OWNER ONLY FUNCTIONS ////////////
 function issue_eth(topl_address, eth_address, amount) {
