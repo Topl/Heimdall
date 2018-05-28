@@ -57,6 +57,13 @@ function start_transfer(eth_address, amount) {
     // broadcast event containing topl_address, eth_address, and amount
 }
 
+function get_transfer_status(topl_address) {
+    if (transfers.topl_address.active === true) {
+        return true;
+    }
+    return false;
+}
+
 
 //////////// HELPER FUNCTIONS ////////////
 function safeAdd(a, b) {
