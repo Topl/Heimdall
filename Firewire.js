@@ -1,23 +1,29 @@
 //////////// GLOBALS ////////////
 users = {};
+transfers = {};
 
 
 //////////// OWNER ONLY FUNCTIONS ////////////
 function issue_eth(topl_address, eth_address, amount) {
     // check that msg.sender is owner
-    if (users.topl_address === "undefined") { // new user
-        users.topl_address = {"eth_adrs": eth_address, "balance": amount};
-    } else { // existing user
-        users.topl_address.balance = safeAdd(users.topl_address.balance, amount);
-    }
     // create ether assets
     // send ether assets
 }
 
+function approve_transfer(topl_address, eth_address, amount) {
+
+}
+
 
 //////////// PUBLIC FUNCTIONS ////////////
-function start_transfer(topl_address, eth_address, amount) {
-
+function start_transfer(eth_address, amount) {
+    topl_address = msg.sender; // not how this works. just go with it.
+    if (transfers.topl_address.active === true) {
+        throw "TRANSFER ALREADY IN PROGRESS"
+    } else {
+        transfers.topl_address = {"eth_adrs": eth_address, "balance": amount, "active": true};
+    }
+    // broadcast event containing topl_address, eth_address, and amount
 }
 
 
@@ -60,3 +66,7 @@ function safeDiv(a, b) {
         return c;
     }
 }
+
+
+//////////// EVENTS ////////////
+
