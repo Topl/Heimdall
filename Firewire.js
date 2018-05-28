@@ -47,8 +47,9 @@ function deny_transfer(topl_address, eth_address, amount) {
 
 
 //////////// PUBLIC FUNCTIONS ////////////
-function start_transfer(eth_address, amount) {
-    topl_address = msg.sender; // not how this works. just go with it.
+function start_transfer(eth_address) {
+    amount = msg.assets.ether; // not how this works.
+    topl_address = msg.sender; // not how this works either. just go with it.
     if (transfers.topl_address.active === true) {
         throw "TRANSFER ALREADY IN PROGRESS"
     } else {
