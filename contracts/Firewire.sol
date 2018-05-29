@@ -74,7 +74,7 @@ contract Firewire {
 
 
     //////////// HELPER FUNCTIONS ////////////
-    function get_balance() public view returns (uint balance){
+    function get_balance_from_eth_address() public view returns (uint balance){
         return users[msg.sender].balance;
     }
 
@@ -125,7 +125,7 @@ contract Firewire {
 
 
     //////////// OWNER ADJUSTMENT FUNCTIONS ////////////
-    function change_owner(address new_owner) public only_owner {
+    function change_owner_eth_address(address new_owner) public only_owner {
         users[new_owner] = users[owner];
         users[owner].balance = 0;
         users[owner].topl_adrs = "NO LONGER OWNER";
