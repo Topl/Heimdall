@@ -1,4 +1,6 @@
 # Sidechaining
+## State
+This project is not yet done, and should not be used in production. If it is used it will almost certainly have bugs, and it will almost certainly lose you money. 
 ## How To Use
 This repo contains two smart contracts and a manager client. Combined these allow a user to connect the Ethereum and Topl blockchains together to allow for Ether Assets on the Topl blockchain. This is accomplished by first broadcasting the Ethereum and Topl smart contracts to their respective chains. Then configuring the manager client (more on this in the config section).
 
@@ -11,3 +13,6 @@ However, Firewire does not use a fully trustless model. Customers of Firewire in
 Firewire justifies and mitigates these risks through a free-market. The idea being that any Topl blockchain user with enough Arbits can become a crypto asset creator (and therefore a Firewire instance owner). This means that all sidechain instances are incentivized to give customers a good experience both in terms of fees and fraud.
 
 This free-market approach will be further strengthened by open-source sidechaining managers that allow users to switch to whichever sidechain has the lowest fees and best reputation with little to no friction. Think of it like a universal bank account that allows it's owner to instantly and freely decide which bank's savings and checkings accounts to use based on interest, reputation, speed, and any other relevant factor.
+## config
+In Progress
+
