@@ -1,8 +1,10 @@
-//////////// CONTRACT CLASS WRAP ////////////
-var contract = class {
-    //////////// GLOBALS ////////////
-    this.transfers = {};
-    this.owner = contract.owner; // init owner as contract creator (not how this works either)
+class Firewire {
+    //////////// CONSTRUCTOR ////////////
+    constructor() {
+        this.transfers = {};
+        this.owner = msg.sender;
+    }
+
 
     //////////// OWNER ONLY FUNCTIONS ////////////
     issue_eth(topl_address, eth_address, amount) {
@@ -50,8 +52,8 @@ var contract = class {
 
     //////////// PUBLIC FUNCTIONS ////////////
     start_transfer(eth_address) {
-        var amount = msg.assets.ether; // not how this works.
-        var topl_address = msg.sender; // not how this works either. just go with it.
+        let amount = msg.assets.ether; // not how this works.
+        let topl_address = msg.sender; // not how this works either. just go with it.
         if (this.transfers.topl_address.active === true) {
             throw "TRANSFER ALREADY IN PROGRESS"
         } else {
@@ -61,7 +63,7 @@ var contract = class {
     }
 
     get_transfer_status(topl_address) {
-        if (transfers.topl_address.active === true) {
+        if (this.transfers.topl_address.active === true) {
             return true;
         }
         return false;
@@ -70,7 +72,7 @@ var contract = class {
 
     //////////// HELPER FUNCTIONS ////////////
     static safeAdd(a, b) {
-        c = a + b;
+        let c = a + b;
         if (c < a || c < b) {
             throw "OVER/UNDERFLOW ERROR";
         } else {
@@ -79,7 +81,7 @@ var contract = class {
     }
 
     static safeSub(a, b) {
-        c = a - b;
+        let c = a - b;
         if (c > a) {
             throw "OVER/UNDERFLOW ERROR";
         } else {
@@ -88,7 +90,7 @@ var contract = class {
     }
 
     static safeMul(a, b) {
-        c = a * b;
+        let c = a * b;
         if (a === 0) {
             return 0;
         }
@@ -100,12 +102,12 @@ var contract = class {
     }
 
     static safeDiv(a, b) {
-        c = a / b;
+        let c = a / b;
         if (b === 0) {
             throw "OVER/UNDERFLOW ERROR";
         } else {
             return c;
         }
     }
-};
+}
 
