@@ -19,12 +19,12 @@ contract Firewire {
 
 
     //////////// GLOBALS ////////////
-    address private owner; // contract owner for // can be changed later
+    address public owner; // contract owner for // can be changed later
     mapping(address => user) private users; // user address to user balance mapping
     mapping(address => uint) private in_progress_wds; // partially signed withdrawals
     uint private min_wd_amount; // can be changed later
-    uint private withdrawal_fee;
-    uint private deposit_fee;
+    uint public withdrawal_fee;
+    uint public deposit_fee;
 
 
     //////////// CONSTRUCTOR ////////////
@@ -90,24 +90,12 @@ contract Firewire {
         }
     }
 
-    function get_owner_address() public view returns (address o) {
-        return owner;
-    }
-
     function get_owner_topl_address() public view returns (string topl_address) {
         return users[owner].topl_adrs;
     }
 
     function get_owner_balance() public view returns (uint balance) {
         return users[owner].balance;
-    }
-
-    function get_deposit_fee() public view returns (uint fee) {
-        return deposit_fee;
-    }
-
-    function get_withdrawal_fee() public view returns (uint fee) {
-        return withdrawal_fee;
     }
 
 
