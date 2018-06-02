@@ -101,7 +101,7 @@ contract Firewire {
 
     //////////// INTERNAL FUNCTIONS ////////////
     function valid_withdrawal(address adrs, uint256 amount) internal view returns (bool retVal) {
-        assert(amount.sub(withdrawal_fee) > min_wd_amount); // can't withdraw less than the minimum
+        if (amount.sub(withdrawal_fee) < min_wd_amount){}/ can't withdraw less than the minimum
         assert(users[adrs].balance.sub(amount).sub(withdrawal_fee) >= 0); // can't go into debt
         // NOTE: this allows for users to leave dust behind
         return true;

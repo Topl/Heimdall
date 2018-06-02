@@ -59,4 +59,25 @@ contract BifrostStorage is Owned{
     function editVar_depositFee(uint256 _depositFee) fromMaster public {
         depositFee = _depositFee;
     }
+
+    /// load var functions
+    function loadVar_users_keyValue(address _ethAdrs) fromMaster view public {
+        return (users[_ethAdrs].toplAdrs, users[_ethAdrs].balance); // returns a list because structs are just loose variable bags NOT objects
+    }
+
+    function loadVar_inProgress_keyValue(address _ethAdrs) fromMaster view public {
+        return inProgress[_ethAdrs];
+    }
+
+    function loadVar_minWithdrawalAmount() fromMaster view public {
+        return minWithdrawalAmount;
+    }
+
+    function loadVar_withdrawalFee() fromMaster view public {
+        return withdrawalFee;
+    }
+
+    function loadVar_depositFee() fromMaster view public {
+        return depositFee;
+    }
 }
