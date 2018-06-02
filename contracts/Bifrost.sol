@@ -23,8 +23,9 @@ contract Bifrost is Owned{
     }
 
     /// constructor
-    constructor(address _bifrostStorage) public {
+    constructor(address _bifrostStorage, string _toplAdrs) public {
         bifrostStorage = _bifrostStorage;
+        editUsers(owner, _toplAdrs, 0);
     }
 
     /// bifrost logic
@@ -71,22 +72,31 @@ contract Bifrost is Owned{
         /// load storage
         inProgressWithdrawal wd = loadInProgress_keyValue(_ethAdrs);
         user account = loadUsers_keyValue(_ethAdrs);
+        user ownerAccount = loadUsers_keyValue(owner);
+        uint256 withdrawalFee = loadWithdrawalFee();
 
         /// function logic
         assert(wd.ethAdrs == _ethAdrs && wd.amount == _amount);
         wd.amount = 0;
-        account.
+        ownerAccount.balance = ownerAccount.balance.add(withdrawalFee);
+        account.balance = account.balance.sub(_amount).sub(withdrawalFee);
 
+        /// edit storage
+        editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
+        editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        editInProgress(wd.ethAdrs, ed.amount);
 
+        /// function logic (has to be after edit storage to prevent re-entrant behavior)
+        _ethAdrs.transfer(_amount);
+
+        /// events
+        // APPROVED WITHDRAWAL
     }
 
-    function approve_withdrawal(address user_adrs, uint256 amount) public only_owner { //
-        assert(in_progress_wds[user_adrs] == amount); // make sure the tx is what the owner thinks it's signing off on
-        receiver.transfer(amount); // do it
-        in_progress_wds[user_adrs] = 0; // reset withdrawal to allow for future withdrawals
-        users[user_adrs].balance = users[user_adrs].balance.sub(amount).sub(withdrawal_fee); // subtract from user account balance
-        users[owner].balance = users[owner].balance.add(withdrawal_fee);
-        emit e_withdrawal_approved(user_adrs, users[user_adrs].topl_adrs, amount, withdrawal_fee); // event
+    function denyWithdrawal(address _ethAdrs, uint256 _amount) ownerOnly public {
+        /// load storage
+
+
     }
 
         /// helper functions
@@ -96,7 +106,7 @@ contract Bifrost is Owned{
         uint256 withdrawalFee = loadWithdrawalFee();
         user account = loadUsers_keyValue(_adrs);
 
-        if (_amount.sub(withdrawalFee) < minWithdrawalAmount) { // min withdrawal check
+        if (_amount < minWithdrawalAmount) { // min withdrawal check
             return false;
         }
 
