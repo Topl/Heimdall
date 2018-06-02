@@ -8,7 +8,7 @@ contract Firewire {
 
 
     //////////// LIBRARIES ////////////
-    using SafeMath for uint; // NO OVERFLOWS
+    using SafeMath for uint256; // NO OVERFLOWS
 
 
     //////////// STRUCTS ////////////
@@ -21,10 +21,10 @@ contract Firewire {
     //////////// GLOBALS ////////////
     address public owner; // contract owner for // can be changed later
     mapping(address => user) private users; // user address to user balance mapping
-    mapping(address => uint) private in_progress_wds; // partially signed withdrawals
-    uint private min_wd_amount; // can be changed later
-    uint public withdrawal_fee;
-    uint public deposit_fee;
+    mapping(address => uint256) private in_progress_wds; // partially signed withdrawals
+    uint256 private min_wd_amount; // can be changed later
+    uint256 public withdrawal_fee;
+    uint256 public deposit_fee;
 
 
     //////////// CONSTRUCTOR ////////////
@@ -51,13 +51,13 @@ contract Firewire {
         emit e_deposit(msg.sender, users[msg.sender].topl_adrs, msg.value, users[msg.sender].balance, deposit_fee); // event
     }
 
-    function start_withdrawal(uint amount) public {
+    function start_withdrawal(uint256 amount) public {
         assert(valid_withdrawal(msg.sender, amount));
         in_progress_wds[msg.sender] = amount; // add to pending wds
         emit e_withdrawal_started(msg.sender, amount); // event
     }
 
-    function approve_withdrawal(address user_adrs, uint amount) public only_owner { //
+    function approve_withdrawal(address user_adrs, uint256 amount) public only_owner { //
         assert(in_progress_wds[user_adrs] == amount); // make sure the tx is what the owner thinks it's signing off on
         receiver.transfer(amount); // do it
         in_progress_wds[user_adrs] = 0; // reset withdrawal to allow for future withdrawals
@@ -66,7 +66,7 @@ contract Firewire {
         emit e_withdrawal_approved(user_adrs, users[user_adrs].topl_adrs, amount, withdrawal_fee); // event
     }
 
-    function deny_withdrawal(address user_adrs, uint amount) public only_owner {
+    function deny_withdrawal(address user_adrs, uint256 amount) public only_owner {
         assert(in_progress_wds[user_adrs] == amount); // make sure the tx is what the owner thinks it's signing off on
         in_progress_wds[user_adrs] = 0; // reset withdrawal to allow for future withdrawals
         emit e_withdrawal_denied(user_adrs, amount); // event
@@ -74,7 +74,7 @@ contract Firewire {
 
 
     //////////// HELPER FUNCTIONS ////////////
-    function get_balance_from_eth_address() public view returns (uint balance){
+    function get_balance_from_eth_address() public view returns (uint256 balance){
         return users[msg.sender].balance;
     }
 
@@ -94,13 +94,13 @@ contract Firewire {
         return users[owner].topl_adrs;
     }
 
-    function get_owner_balance() public view returns (uint balance) {
+    function get_owner_balance() public view returns (uint256 balance) {
         return users[owner].balance;
     }
 
 
     //////////// INTERNAL FUNCTIONS ////////////
-    function valid_withdrawal(address adrs, uint amount) internal view returns (bool retVal) {
+    function valid_withdrawal(address adrs, uint256 amount) internal view returns (bool retVal) {
         assert(amount.sub(withdrawal_fee) > min_wd_amount); // can't withdraw less than the minimum
         assert(users[adrs].balance.sub(amount).sub(withdrawal_fee) >= 0); // can't go into debt
         // NOTE: this allows for users to leave dust behind
@@ -119,15 +119,15 @@ contract Firewire {
         users[owner].topl_adrs = topl_address;
     }
 
-    function change_min_wd_amount(uint new_min_wd_amount) public only_owner { // REMEMBER THIS IS IN WEI
+    function change_min_wd_amount(uint256 new_min_wd_amount) public only_owner { // REMEMBER THIS IS IN WEI
         min_wd_amount = new_min_wd_amount;
     }
 
-    function change_withdrawal_fee(uint new_withdrawal_fee) public only_owner {
+    function change_withdrawal_fee(uint256 new_withdrawal_fee) public only_owner {
         withdrawal_fee = new_withdrawal_fee;
     }
 
-    function change_deposit_fee(uint new_deposit_fee) public only_owner {
+    function change_deposit_fee(uint256 new_deposit_fee) public only_owner {
         deposit_fee = new_deposit_fee;
     }
 
@@ -147,10 +147,10 @@ contract Firewire {
 
 
     //////////// EVENTS ////////////
-    event e_deposit(address user, string topl_address, uint amount, uint balance, uint fee);
-    event e_withdrawal_started(address user, uint amount);
-    event e_withdrawal_approved(address user, string topl_address, uint amount, uint fee);
-    event e_withdrawal_denied(address user, uint amount);
-    event e_fallback(address sender, uint amount);
+    event e_deposit(address user, string topl_address, uint256 amount, uint256 balance, uint256 fee);
+    event e_withdrawal_started(address user, uint256 amount);
+    event e_withdrawal_approved(address user, string topl_address, uint256 amount, uint256 fee);
+    event e_withdrawal_denied(address user, uint256 amount);
+    event e_fallback(address sender, uint256 amount);
 }
 
