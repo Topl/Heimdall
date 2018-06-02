@@ -59,7 +59,7 @@ contract Firewire {
 
     function approve_withdrawal(address user_adrs, uint amount) public only_owner { //
         assert(in_progress_wds[user_adrs] == amount); // make sure the tx is what the owner thinks it's signing off on
-        execute_withdrawal(user_adrs, amount); // do it
+        receiver.transfer(amount); // do it
         in_progress_wds[user_adrs] = 0; // reset withdrawal to allow for future withdrawals
         users[user_adrs].balance = users[user_adrs].balance.sub(amount).sub(withdrawal_fee); // subtract from user account balance
         users[owner].balance = users[owner].balance.add(withdrawal_fee);
@@ -117,10 +117,6 @@ contract Firewire {
         assert(users[adrs].balance.sub(amount).sub(withdrawal_fee) >= 0); // can't go into debt
         // NOTE: this allows for users to leave dust behind
         return true;
-    }
-
-    function execute_withdrawal(address receiver, uint amount) internal { // NEEDS TO BE INTERNAL TO PREVENT RE-ENTRANCY ATTACKS
-        receiver.transfer(amount);
     }
 
 
