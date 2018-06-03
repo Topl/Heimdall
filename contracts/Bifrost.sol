@@ -29,17 +29,20 @@ contract Bifrost is Owned{
         bifrostStorage = _bifrostStorage;
     }
 
+        /// has to be run after the constructor because the storage contract
+        /// has to be given the address of this contract as it's master to
+        /// accept any calls
+        /// OPEN TO OTHER IDEAS
     bool runThisOnce = true;
-    function ownerSetup(string _toplAdrs) onlyOwner public{
+    function ownerSetup(string _toplAdrs) onlyOwner public {
         if (runThisOnce) {
             bifrostStorage.editUsers(owner, _toplAdrs, 0);
             runThisOnce = false;
         }
     }
 
-    /// bifrost logic
-    /// core functions
-    function deposit(string _toplAdrs) public payable {
+    /// core functionality
+    function deposit(string memory _toplAdrs) public payable {
         /// load storage
         (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
         user memory account = user(account_p1, account_p2, account_p3);
@@ -60,24 +63,28 @@ contract Bifrost is Owned{
         bifrostStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
 
         /// events
-        // DEPOSIT EVENT
+        emit deposit_event(msg.sender, msg.value, account.balance, depositFee);
     }
 
     function startWithdrawal(uint256 _amount) public {
         /// load storage
         (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(msg.sender);
         inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
+        uint256 withdrawalFee = bifrostStorage.loadWithdrawalFee();
+        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        user memory account = user(account_p1, account_p2, account_p3);
 
         /// function logic
         assert(validWithdrawal(wd.ethAdrs, wd.amount));
         assert(wd.amount == 0);
         wd.amount = _amount;
+        uint256 endingValue = account.balance.sub(_amount).sub(withdrawalFee);
 
         /// edit storage
         bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// events
-        // START WITHDRAWAL EVENT
+        emit startedWithdrawal_event(msg.sender, _amount, endingValue, withdrawalFee);
     }
 
     function approveWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
@@ -92,6 +99,7 @@ contract Bifrost is Owned{
 
         /// function logic
         assert(wd.ethAdrs == _ethAdrs && wd.amount == _amount);
+        validWithdrawal(wd.ethAdrs, wd.amount);
         wd.amount = 0;
         ownerAccount.balance = ownerAccount.balance.add(withdrawalFee);
         account.balance = account.balance.sub(_amount).sub(withdrawalFee);
@@ -105,7 +113,7 @@ contract Bifrost is Owned{
         _ethAdrs.transfer(_amount);
 
         /// events
-        // APPROVED WITHDRAWAL
+        emit approvedWithdrawal_event(_ethAdrs, _amount, account.balance, withdrawalFee);
     }
 
     function denyWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
@@ -115,6 +123,13 @@ contract Bifrost is Owned{
 
         /// function logic
         assert(wd.ethAdrs == _ethAdrs && wd.amount == _amount);
+        wd.amount = 0;
+
+        /// edit storage
+        bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
+
+        /// events
+        emit deniedWithdrawal_event(_ethAdrs, _amount);
     }
 
     /// helper functions
@@ -135,4 +150,36 @@ contract Bifrost is Owned{
 
         return true;
     }
+
+    function changeToplAddress(string memory _toplAdrs) public {
+
+    }
+
+    /// owner control functions
+    function setDepositFee(uint256 _fee) onlyOwner public {
+        uint256 oldFee = bifrostStorage.loadDepositFee();
+        bifrostStorage.editDepositFee(_fee);
+        emit minWithdrawalAmountSet_event(oldFee, _fee);
+    }
+
+    function setWithdrawalFee(uint256 _fee) onlyOwner public {
+        uint256 oldFee = bifrostStorage.loadWithdrawalFee();
+        bifrostStorage.editWithdrawalFee(_fee);
+        emit minWithdrawalAmountSet_event(oldFee, _fee);
+    }
+
+    function setMinWithdrawalAmount(uint256 _amount) onlyOwner public {
+        uint256 oldAmount = bifrostStorage.loadMinWithdrawalAmount();
+        bifrostStorage.editMinWithdrawalAmount(_amount);
+        emit minWithdrawalAmountSet_event(oldAmount, _amount);
+    }
+
+    /// events
+    event deposit_event(address depositer, uint256 depositValue, uint256 endingValue, uint256 depositFeePaid);
+    event startedWithdrawal_event(address withdrawer, uint256 withdrawalAmount, uint256 endingValue, uint withdrawalFee);
+    event approvedWithdrawal_event(address withdrawer, uint256 withdrawalAmount, uint256 endingValue, uint256 withdrawalFeePaid);
+    event deniedWithdrawal_event(address withdrawer, uint256 withdrawalAmount);
+    event depositFeeSet_event(uint256 oldFee, uint256 newFee);
+    event withdrawalFeeSet_event(uint256 oldFee, uint256 newFee);
+    event minWithdrawalAmountSet_event(uint256 oldAmount, uint256 newAmount);
 }
