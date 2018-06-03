@@ -1,19 +1,21 @@
-pragma solidity 0.4.23;
+pragma solidity ^0.4.23;
 
 import "./SafeMath.sol";
 import "./Owned.sol";
+import "./BifrostLogic.sol";
 
 
 contract Bifrost is Owned{
 
     using SafeMath for uint256; // no overflows
+    using BifrostLogic for address;
 
-    address bifrostStorage; // separate storage for upgradability
+    address public bifrostStorage; // separate storage for upgradability
 
     /// storage return structs
     struct user {
         address ethAdrs;
-        string toplAdrs;
+        string  toplAdrs;
         uint256 balance;
     }
 
@@ -23,30 +25,39 @@ contract Bifrost is Owned{
     }
 
     /// constructor
-    constructor(address _bifrostStorage, string _toplAdrs) public {
+    constructor(address _bifrostStorage) public payable {
         bifrostStorage = _bifrostStorage;
-        editUsers(owner, _toplAdrs, 0);
+    }
+
+    bool runThisOnce = true;
+    function ownerSetup(string _toplAdrs) onlyOwner public{
+        if (runThisOnce) {
+            bifrostStorage.editUsers(owner, _toplAdrs, 0);
+            runThisOnce = false;
+        }
     }
 
     /// bifrost logic
-        /// core functions
+    /// core functions
     function deposit(string _toplAdrs) public payable {
         /// load storage
-        user account = loadUsers_keyValue(msg.sender);
-        user ownerAccount = loadUsers_keyValue(owner);
-        uint256 depositFee = loadDepositFee();
+        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        user memory account = user(account_p1, account_p2, account_p3);
+        (address owner_p1, string memory owner_p2, uint256 owner_p3) = bifrostStorage.loadUsers_keyValue(owner);
+        user memory ownerAccount = user(owner_p1, owner_p2, owner_p3);
+        uint256 depositFee = bifrostStorage.loadDepositFee();
 
         /// function logic
-        if (account.toplAdrs != _toplAdrs) { // update topl address if new
-            account.toplAdrs == _toplAdrs;
+        if (sha3(account.toplAdrs) != sha3(_toplAdrs)) { // update topl address if new
+            account.toplAdrs = _toplAdrs;
         }
         assert(account.balance.add(msg.value).sub(depositFee) > 0); // shouldn't ever throw due to safe math...
         ownerAccount.balance = ownerAccount.balance.add(depositFee);
         account.balance = account.balance.add(msg.value).sub(depositFee);
 
         /// edit storage
-        editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        bifrostStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
+        bifrostStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
 
         /// events
         // DEPOSIT EVENT
@@ -54,26 +65,30 @@ contract Bifrost is Owned{
 
     function startWithdrawal(uint256 _amount) public {
         /// load storage
-        inProgressWithdrawal wd = loadInProgress_keyValue(msg.sender);
+        (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(msg.sender);
+        inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
 
         /// function logic
-        assert(validWithdrawal);
+        assert(validWithdrawal(wd.ethAdrs, wd.amount));
         assert(wd.amount == 0);
         wd.amount = _amount;
 
         /// edit storage
-        editInProgress(wd.ethAdrs, wd.amount);
+        bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// events
         // START WITHDRAWAL EVENT
     }
 
-    function approveWithdrawal(address _ethAdrs, uint256 _amount) ownerOnyly public {
+    function approveWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
         /// load storage
-        inProgressWithdrawal wd = loadInProgress_keyValue(_ethAdrs);
-        user account = loadUsers_keyValue(_ethAdrs);
-        user ownerAccount = loadUsers_keyValue(owner);
-        uint256 withdrawalFee = loadWithdrawalFee();
+        (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(_ethAdrs);
+        inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
+        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(_ethAdrs);
+        user memory account = user(account_p1, account_p2, account_p3);
+        (address owner_p1, string memory owner_p2, uint256 owner_p3) = bifrostStorage.loadUsers_keyValue(owner);
+        user memory ownerAccount = user(owner_p1, owner_p2, owner_p3);
+        uint256 withdrawalFee = bifrostStorage.loadWithdrawalFee();
 
         /// function logic
         assert(wd.ethAdrs == _ethAdrs && wd.amount == _amount);
@@ -82,9 +97,9 @@ contract Bifrost is Owned{
         account.balance = account.balance.sub(_amount).sub(withdrawalFee);
 
         /// edit storage
-        editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        editUsers(account.ethAdrs, account.toplAdrs, account.balance);
-        editInProgress(wd.ethAdrs, ed.amount);
+        bifrostStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
+        bifrostStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// function logic (has to be after edit storage to prevent re-entrant behavior)
         _ethAdrs.transfer(_amount);
@@ -93,18 +108,22 @@ contract Bifrost is Owned{
         // APPROVED WITHDRAWAL
     }
 
-    function denyWithdrawal(address _ethAdrs, uint256 _amount) ownerOnly public {
+    function denyWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
         /// load storage
+        (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(_ethAdrs);
+        inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
 
-
+        /// function logic
+        assert(wd.ethAdrs == _ethAdrs && wd.amount == _amount);
     }
 
-        /// helper functions
-    function validWithdraw(address _adrs, uint256 _amount) internal view returns (bool validity) {
+    /// helper functions
+    function validWithdrawal(address _adrs, uint256 _amount) internal view returns (bool validity) {
         /// load storage
-        uint256 minWithdrawalAmount = loadMinWithdrawalAmount();
-        uint256 withdrawalFee = loadWithdrawalFee();
-        user account = loadUsers_keyValue(_adrs);
+        uint256 minWithdrawalAmount = bifrostStorage.loadMinWithdrawalAmount();
+        uint256 withdrawalFee = bifrostStorage.loadWithdrawalFee();
+        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(_adrs);
+        user memory account = user(account_p1, account_p2, account_p3);
 
         if (_amount < minWithdrawalAmount) { // min withdrawal check
             return false;
@@ -116,52 +135,4 @@ contract Bifrost is Owned{
 
         return true;
     }
-
-
-
-    /// bifrost storage edit & load functions
-        /// editors
-    function editUsers(address _ethAdrs, string _toplAdrs, uint256 _balance) internal {
-        bifrostStorage.call(bytes4(sha3("editVar_users(address,string,uint256)")), _ethAdrs, _toplAdrs, _balance);
-    }
-
-    function editInProgress(address _ethAdrs, uint256 _amount) internal {
-        bifrostStorage.call(bytes4(sha3("editVar_inProgress(address,uint256)")), _ethAdrs, _amount);
-    }
-
-    function editMinWithdrawalAmount(uint256 _minWithdrawalAmount) internal {
-        bifrostStorage.call(bytes4(sha3("editVar_minWithdrawalAmount(uint256)")), _minWithdrawalAmount);
-    }
-
-    function editWithdrawalFee(uint256 _withdrawalFee) internal {
-        bifrostStorage.call(bytes4(sha3("editVar_withdrawalFee(uint256)")), _withdrawalFee);
-    }
-
-    function editDepositFee(uint256 _depositFee) internal {
-        bifrostStorage.call(bytes4(sha3("editVar_depositFee(uint256)")), _depositFee);
-    }
-
-        /// loaders
-    function loadUsers_keyValue(address _ethAdrs) internal {
-        var data = bifrostStorage.call(bytes4(sha3("loadVar_users_keyValue(address)")), _ethAdrs);
-        return user(_ethAdrs, data[0], data[1]);
-    }
-
-    function loadInProgress_keyValue(address _ethAdrs) internal {
-        var data = bifrostStorage.call(bytes4(sha3("loadVar_inProgress_keyValue(address)")), _ethAdrs);
-        return inProgressWithdrawal(_ethAdrs, data);
-    }
-
-    function loadMinWithdrawalAmount() internal {
-        return bifrostStorage.call(bytes4(sha3("loadVar_minWithdrawalAmount()")));
-    }
-
-    function loadWithdrawalFee() internal {
-        return bifrostStorage.call(bytes4(sha3("loadVar_withdrawalFee()")));
-    }
-
-    function loadDepositFee() internal {
-        return bifrostStorage.call(bytes4(sha3("loadVar_depositFee()")));
-    }
-
 }

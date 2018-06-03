@@ -61,23 +61,23 @@ contract BifrostStorage is Owned{
     }
 
     /// load var functions
-    function loadVar_users_keyValue(address _ethAdrs) fromMaster view public {
-        return (users[_ethAdrs].toplAdrs, users[_ethAdrs].balance); // returns a list because structs are just loose variable bags NOT objects
+    function loadVar_users_keyValue(address _ethAdrs) fromMaster view public returns(string memory, uint256){
+        return (users[_ethAdrs].toplAdrs, users[_ethAdrs].balance);
     }
 
-    function loadVar_inProgress_keyValue(address _ethAdrs) fromMaster view public {
+    function loadVar_inProgress_keyValue(address _ethAdrs) fromMaster view public returns(uint256){
         return inProgress[_ethAdrs];
     }
 
-    function loadVar_minWithdrawalAmount() fromMaster view public {
+    function loadVar_minWithdrawalAmount() fromMaster view public returns(uint256){
         return minWithdrawalAmount;
     }
 
-    function loadVar_withdrawalFee() fromMaster view public {
+    function loadVar_withdrawalFee() fromMaster view public returns(uint256){
         return withdrawalFee;
     }
 
-    function loadVar_depositFee() fromMaster view public {
+    function loadVar_depositFee() fromMaster view public returns(uint256){
         return depositFee;
     }
 }
