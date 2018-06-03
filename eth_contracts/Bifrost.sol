@@ -152,7 +152,29 @@ contract Bifrost is Owned{
     }
 
     function changeToplAddress(string memory _toplAdrs) public {
+        /// load storage
+        (address p1, string memory p2, uint256 p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        user memory account = user(p1, p2, p3);
 
+        /// edit storage
+        bifrostStorage.editUsers(account.ethAdrs, _toplAdrs, account.balance);
+
+        /// events
+        emit changedToplAddress_event(account.ethAdrs, account.balance, p2, account.toplAdrs);
+    }
+
+    function changeEthAddress(address _newEthAdrs) public {
+        /// load storage
+        (address p1, string memory p2, uint256 p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        user memory account = user(p1, p2, p3);
+        user memory newAccount = user(_newEthAdrs, p2, p3);
+
+        /// edit storage
+        bifrostStorage.editUsers(account.ethAdrs, "previously used", 0);
+        bifrostStorage.editUsers(newAccount.ethAdrs, newAccount.toplAdrs, newAccount.balance);
+
+        /// events
+        emit changedToplAddress_event(p2, p3, p1, _newEthAdrs);
     }
 
     /// owner control functions
@@ -182,4 +204,6 @@ contract Bifrost is Owned{
     event depositFeeSet_event(uint256 oldFee, uint256 newFee);
     event withdrawalFeeSet_event(uint256 oldFee, uint256 newFee);
     event minWithdrawalAmountSet_event(uint256 oldAmount, uint256 newAmount);
+    event changedToplAddress_event(address ethAdrs, uint256 balance, string oldToplAdrs, string newToplAdrs);
+    event changedToplAddress_event(string toplAdrs, uint256 balance, address oldEthAdrs, address newEthAdrs);
 }
