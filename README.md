@@ -16,3 +16,6 @@ This free-market approach will be further strengthened by open-source sidechaini
 ## config
 In Progress
 
+## to do
+- manager
+
