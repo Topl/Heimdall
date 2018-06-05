@@ -2,15 +2,15 @@ pragma solidity ^0.4.23;
 
 import "./SafeMath.sol";
 import "./Owned.sol";
-import "./BifrostLogic.sol";
+import "./HeimdallLogic.sol";
 
 
-contract Bifrost is Owned{
+contract Heimdall is Owned{
 
     using SafeMath for uint256; // no overflows
-    using BifrostLogic for address;
+    using HeimdallLogic for address;
 
-    address public bifrostStorage; // separate storage for upgradability
+    address public heimdallStorage; // separate storage for upgradability
 
     /// storage return structs
     struct user {
@@ -25,8 +25,8 @@ contract Bifrost is Owned{
     }
 
     /// constructor
-    constructor(address _bifrostStorage) public payable {
-        bifrostStorage = _bifrostStorage;
+    constructor(address _heimdallStorage) public payable {
+        heimdallStorage = _heimdallStorage;
     }
 
         /// has to be run after the constructor because the storage contract
@@ -36,7 +36,7 @@ contract Bifrost is Owned{
     bool runThisOnce = true;
     function ownerSetup(string _toplAdrs) onlyOwner public {
         if (runThisOnce) {
-            bifrostStorage.editUsers(owner, _toplAdrs, 0);
+            heimdallStorage.editUsers(owner, _toplAdrs, 0);
             runThisOnce = false;
         }
     }
@@ -44,11 +44,11 @@ contract Bifrost is Owned{
     /// core functionality
     function deposit(string memory _toplAdrs) public payable {
         /// load storage
-        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        (address account_p1, string memory account_p2, uint256 account_p3) = heimdallStorage.loadUsers_keyValue(msg.sender);
         user memory account = user(account_p1, account_p2, account_p3);
-        (address owner_p1, string memory owner_p2, uint256 owner_p3) = bifrostStorage.loadUsers_keyValue(owner);
+        (address owner_p1, string memory owner_p2, uint256 owner_p3) = heimdallStorage.loadUsers_keyValue(owner);
         user memory ownerAccount = user(owner_p1, owner_p2, owner_p3);
-        uint256 depositFee = bifrostStorage.loadDepositFee();
+        uint256 depositFee = heimdallStorage.loadDepositFee();
 
         /// function logic
         if (sha3(account.toplAdrs) != sha3(_toplAdrs)) { // update topl address if new
@@ -59,8 +59,8 @@ contract Bifrost is Owned{
         account.balance = account.balance.add(msg.value).sub(depositFee);
 
         /// edit storage
-        bifrostStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        bifrostStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        heimdallStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
+        heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
 
         /// events
         emit deposit_event(msg.sender, msg.value, account.balance, depositFee);
@@ -68,10 +68,10 @@ contract Bifrost is Owned{
 
     function startWithdrawal(uint256 _amount) public {
         /// load storage
-        (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(msg.sender);
+        (address wd_p1, uint256 wd_p2) = heimdallStorage.loadInProgress_keyValue(msg.sender);
         inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
-        uint256 withdrawalFee = bifrostStorage.loadWithdrawalFee();
-        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        uint256 withdrawalFee = heimdallStorage.loadWithdrawalFee();
+        (address account_p1, string memory account_p2, uint256 account_p3) = heimdallStorage.loadUsers_keyValue(msg.sender);
         user memory account = user(account_p1, account_p2, account_p3);
 
         /// function logic
@@ -81,7 +81,7 @@ contract Bifrost is Owned{
         uint256 endingValue = account.balance.sub(_amount).sub(withdrawalFee);
 
         /// edit storage
-        bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
+        heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// events
         emit startedWithdrawal_event(msg.sender, _amount, endingValue, withdrawalFee);
@@ -89,13 +89,13 @@ contract Bifrost is Owned{
 
     function approveWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
         /// load storage
-        (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(_ethAdrs);
+        (address wd_p1, uint256 wd_p2) = heimdallStorage.loadInProgress_keyValue(_ethAdrs);
         inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
-        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(_ethAdrs);
+        (address account_p1, string memory account_p2, uint256 account_p3) = heimdallStorage.loadUsers_keyValue(_ethAdrs);
         user memory account = user(account_p1, account_p2, account_p3);
-        (address owner_p1, string memory owner_p2, uint256 owner_p3) = bifrostStorage.loadUsers_keyValue(owner);
+        (address owner_p1, string memory owner_p2, uint256 owner_p3) = heimdallStorage.loadUsers_keyValue(owner);
         user memory ownerAccount = user(owner_p1, owner_p2, owner_p3);
-        uint256 withdrawalFee = bifrostStorage.loadWithdrawalFee();
+        uint256 withdrawalFee = heimdallStorage.loadWithdrawalFee();
 
         /// function logic
         assert(wd.ethAdrs == _ethAdrs && wd.amount == _amount);
@@ -105,9 +105,9 @@ contract Bifrost is Owned{
         account.balance = account.balance.sub(_amount).sub(withdrawalFee);
 
         /// edit storage
-        bifrostStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        bifrostStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
-        bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
+        heimdallStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
+        heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// function logic (has to be after edit storage to prevent re-entrant behavior)
         _ethAdrs.transfer(_amount);
@@ -118,7 +118,7 @@ contract Bifrost is Owned{
 
     function denyWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
         /// load storage
-        (address wd_p1, uint256 wd_p2) = bifrostStorage.loadInProgress_keyValue(_ethAdrs);
+        (address wd_p1, uint256 wd_p2) = heimdallStorage.loadInProgress_keyValue(_ethAdrs);
         inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
 
         /// function logic
@@ -126,7 +126,7 @@ contract Bifrost is Owned{
         wd.amount = 0;
 
         /// edit storage
-        bifrostStorage.editInProgress(wd.ethAdrs, wd.amount);
+        heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// events
         emit deniedWithdrawal_event(_ethAdrs, _amount);
@@ -135,9 +135,9 @@ contract Bifrost is Owned{
     /// helper functions
     function validWithdrawal(address _adrs, uint256 _amount) internal view returns (bool validity) {
         /// load storage
-        uint256 minWithdrawalAmount = bifrostStorage.loadMinWithdrawalAmount();
-        uint256 withdrawalFee = bifrostStorage.loadWithdrawalFee();
-        (address account_p1, string memory account_p2, uint256 account_p3) = bifrostStorage.loadUsers_keyValue(_adrs);
+        uint256 minWithdrawalAmount = heimdallStorage.loadMinWithdrawalAmount();
+        uint256 withdrawalFee = heimdallStorage.loadWithdrawalFee();
+        (address account_p1, string memory account_p2, uint256 account_p3) = heimdallStorage.loadUsers_keyValue(_adrs);
         user memory account = user(account_p1, account_p2, account_p3);
 
         if (_amount < minWithdrawalAmount) { // min withdrawal check
@@ -153,11 +153,11 @@ contract Bifrost is Owned{
 
     function changeToplAddress(string memory _toplAdrs) public {
         /// load storage
-        (address p1, string memory p2, uint256 p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        (address p1, string memory p2, uint256 p3) = heimdallStorage.loadUsers_keyValue(msg.sender);
         user memory account = user(p1, p2, p3);
 
         /// edit storage
-        bifrostStorage.editUsers(account.ethAdrs, _toplAdrs, account.balance);
+        heimdallStorage.editUsers(account.ethAdrs, _toplAdrs, account.balance);
 
         /// events
         emit changedToplAddress_event(account.ethAdrs, account.balance, p2, account.toplAdrs);
@@ -165,13 +165,13 @@ contract Bifrost is Owned{
 
     function changeEthAddress(address _newEthAdrs) public {
         /// load storage
-        (address p1, string memory p2, uint256 p3) = bifrostStorage.loadUsers_keyValue(msg.sender);
+        (address p1, string memory p2, uint256 p3) = heimdallStorage.loadUsers_keyValue(msg.sender);
         user memory account = user(p1, p2, p3);
         user memory newAccount = user(_newEthAdrs, p2, p3);
 
         /// edit storage
-        bifrostStorage.editUsers(account.ethAdrs, "previously used", 0);
-        bifrostStorage.editUsers(newAccount.ethAdrs, newAccount.toplAdrs, newAccount.balance);
+        heimdallStorage.editUsers(account.ethAdrs, "previously used", 0);
+        heimdallStorage.editUsers(newAccount.ethAdrs, newAccount.toplAdrs, newAccount.balance);
 
         /// events
         emit changedToplAddress_event(p2, p3, p1, _newEthAdrs);
@@ -179,20 +179,20 @@ contract Bifrost is Owned{
 
     /// owner control functions
     function setDepositFee(uint256 _fee) onlyOwner public {
-        uint256 oldFee = bifrostStorage.loadDepositFee();
-        bifrostStorage.editDepositFee(_fee);
+        uint256 oldFee = heimdallStorage.loadDepositFee();
+        heimdallStorage.editDepositFee(_fee);
         emit minWithdrawalAmountSet_event(oldFee, _fee);
     }
 
     function setWithdrawalFee(uint256 _fee) onlyOwner public {
-        uint256 oldFee = bifrostStorage.loadWithdrawalFee();
-        bifrostStorage.editWithdrawalFee(_fee);
+        uint256 oldFee = heimdallStorage.loadWithdrawalFee();
+        heimdallStorage.editWithdrawalFee(_fee);
         emit minWithdrawalAmountSet_event(oldFee, _fee);
     }
 
     function setMinWithdrawalAmount(uint256 _amount) onlyOwner public {
-        uint256 oldAmount = bifrostStorage.loadMinWithdrawalAmount();
-        bifrostStorage.editMinWithdrawalAmount(_amount);
+        uint256 oldAmount = heimdallStorage.loadMinWithdrawalAmount();
+        heimdallStorage.editMinWithdrawalAmount(_amount);
         emit minWithdrawalAmountSet_event(oldAmount, _amount);
     }
 

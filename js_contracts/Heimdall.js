@@ -2,13 +2,13 @@ class Firewire {
     //////////// CONSTRUCTOR ////////////
     constructor() {
         this.transfers = {};
-        this.owner = msg.sender;
+        this.owner = MSG_SENDER;
     }
 
 
     //////////// OWNER ONLY FUNCTIONS ////////////
     issue_eth(topl_address, eth_address, amount) {
-        if (msg.sender !== owner) { // owner check
+        if (MSG_SENDER !== owner) { // owner check
             throw "NOT OWNER";
         }
         // create ether assets
@@ -16,7 +16,7 @@ class Firewire {
     }
 
     approve_transfer(topl_address, eth_address, amount) {
-        if (msg.sender !== owner) { // owner check
+        if (MSG_SENDER !== owner) { // owner check
             throw "NOT OWNER";
         }
         if (this.transfers.topl_address.eth_adrs === eth_address && this.transfers.topl_address.balance === amount) { // check that this transfer is what the owner thinks it is
@@ -33,7 +33,7 @@ class Firewire {
     }
 
     deny_transfer(topl_address, eth_address, amount) {
-        if (msg.sender !== owner) { // owner check
+        if (MSG_SENDER !== owner) { // owner check
             throw "NOT OWNER";
         }
         if (this.transfers.topl_address.eth_adrs === eth_address && this.transfers.topl_address.balance === amount) { // check that this transfer is what the owner thinks it is
@@ -52,8 +52,8 @@ class Firewire {
 
     //////////// PUBLIC FUNCTIONS ////////////
     start_transfer(eth_address) {
-        let amount = msg.assets.ether; // not how this works.
-        let topl_address = msg.sender; // not how this works either. just go with it.
+        let amount = MSG_ASSETS.ethereum; // not how this works.
+        let topl_address = MSG_SENDER; // not how this works either. just go with it.
         if (this.transfers.topl_address.active === true) {
             throw "TRANSFER ALREADY IN PROGRESS"
         } else {

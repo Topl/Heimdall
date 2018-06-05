@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 import "./SafeMath.sol";
 import "./Owned.sol";
 
-contract BifrostStorage is Owned{
+contract HeimdallStorage is Owned{
 
     using SafeMath for uint256; // overflow checks
 
