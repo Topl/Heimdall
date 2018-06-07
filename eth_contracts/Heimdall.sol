@@ -174,7 +174,7 @@ contract Heimdall is Owned{
         heimdallStorage.editUsers(newAccount.ethAdrs, newAccount.toplAdrs, newAccount.balance);
 
         /// events
-        emit changedToplAddress_event(p2, p3, p1, _newEthAdrs);
+        emit changedEthAddress_event(p2, p3, p1, _newEthAdrs);
     }
 
     /// owner control functions
@@ -205,5 +205,5 @@ contract Heimdall is Owned{
     event withdrawalFeeSet_event(uint256 oldFee, uint256 newFee);
     event minWithdrawalAmountSet_event(uint256 oldAmount, uint256 newAmount);
     event changedToplAddress_event(address ethAdrs, uint256 balance, string oldToplAdrs, string newToplAdrs);
-    event changedToplAddress_event(string toplAdrs, uint256 balance, address oldEthAdrs, address newEthAdrs);
+    event changedEthAddress_event(string toplAdrs, uint256 balance, address oldEthAdrs, address newEthAdrs);
 }
