@@ -22,7 +22,7 @@ contract Owned {
     /// the owner has to then send the ether to the new contract
     /// preferably via the constructor
     /// if you have a better idea i'm all ears
-    function terminate() ownerOnly external {
+    function terminate() onlyOwner external {
         selfdestruct(owner);
     }
 }
