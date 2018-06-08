@@ -24,7 +24,7 @@ contract HeimdallStorage is Owned{
     uint256 public depositFee;
 
     /// constructor
-    constructor() {
+    constructor() public {
         currentMaster = 0x0;
     }
 
