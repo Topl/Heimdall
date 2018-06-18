@@ -63,7 +63,7 @@ contract Heimdall is Owned{
         heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
 
         /// events
-        emit deposit_event(owner, msg.value, account.balance, depositFee, account.toplAdrs);
+        emit deposit_event(owner, msg.sender, msg.value, account.balance, depositFee, account.toplAdrs);
     }
 
     function startWithdrawal(uint256 _amount) public {
