@@ -88,12 +88,7 @@ contract Heimdall is Owned{
         emit startedWithdrawal_event(msg.sender, _amount, endingValue, withdrawalFee);
     }
 
-    event e_test(bool);
-    event e_test_2(address, string, uint256);
-    event e_test_3(address, string, uint256);
-    event e_test_4(address, uint256);
     function approveWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
-        emit e_test(true);
         /// load storage
         (address wd_p1, uint256 wd_p2) = heimdallStorage.loadInProgress_keyValue(_ethAdrs);
         inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
@@ -111,18 +106,15 @@ contract Heimdall is Owned{
         account.balance = account.balance.sub(_amount).sub(withdrawalFee);
 
         /// edit storage
-        emit e_test_2(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        emit e_test_3(account.ethAdrs, account.toplAdrs, account.balance);
-        emit e_test_4(wd.ethAdrs, wd.amount);
         heimdallStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        //heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
-        //heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
+        heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
 
-        /// function logic (has to be after edit storage to prevent re-entrant behavior)
-        //_ethAdrs.transfer(_amount);
+        // function logic (has to be after edit storage to prevent re-entrant behavior)
+        _ethAdrs.transfer(_amount);
 
-        /// events
-        //emit approvedWithdrawal_event(msg.sender, _ethAdrs, _amount, account.balance, withdrawalFee);
+        // events
+        emit approvedWithdrawal_event(msg.sender, _ethAdrs, _amount, account.balance, withdrawalFee);
     }
 
     function denyWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
