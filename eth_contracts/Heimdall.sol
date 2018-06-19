@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 import "./SafeMath.sol";
 import "./Owned.sol";
@@ -27,6 +27,7 @@ contract Heimdall is Owned{
     /// constructor
     constructor(address _heimdallStorage) public payable {
         heimdallStorage = _heimdallStorage;
+        owner = msg.sender;
     }
 
         /// has to be run after the constructor because the storage contract
@@ -87,7 +88,12 @@ contract Heimdall is Owned{
         emit startedWithdrawal_event(msg.sender, _amount, endingValue, withdrawalFee);
     }
 
+    event e_test(bool);
+    event e_test_2(address, string, uint256);
+    event e_test_3(address, string, uint256);
+    event e_test_4(address, uint256);
     function approveWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
+        emit e_test(true);
         /// load storage
         (address wd_p1, uint256 wd_p2) = heimdallStorage.loadInProgress_keyValue(_ethAdrs);
         inProgressWithdrawal memory wd = inProgressWithdrawal(wd_p1, wd_p2);
@@ -105,15 +111,18 @@ contract Heimdall is Owned{
         account.balance = account.balance.sub(_amount).sub(withdrawalFee);
 
         /// edit storage
+        emit e_test_2(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
+        emit e_test_3(account.ethAdrs, account.toplAdrs, account.balance);
+        emit e_test_4(wd.ethAdrs, wd.amount);
         heimdallStorage.editUsers(ownerAccount.ethAdrs, ownerAccount.toplAdrs, ownerAccount.balance);
-        heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
-        heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
+        //heimdallStorage.editUsers(account.ethAdrs, account.toplAdrs, account.balance);
+        //heimdallStorage.editInProgress(wd.ethAdrs, wd.amount);
 
         /// function logic (has to be after edit storage to prevent re-entrant behavior)
-        _ethAdrs.transfer(_amount);
+        //_ethAdrs.transfer(_amount);
 
         /// events
-        emit approvedWithdrawal_event(msg.sender, _ethAdrs, _amount, account.balance, withdrawalFee);
+        //emit approvedWithdrawal_event(msg.sender, _ethAdrs, _amount, account.balance, withdrawalFee);
     }
 
     function denyWithdrawal(address _ethAdrs, uint256 _amount) onlyOwner public {
@@ -181,13 +190,13 @@ contract Heimdall is Owned{
     function setDepositFee(uint256 _fee) onlyOwner public {
         uint256 oldFee = heimdallStorage.loadDepositFee();
         heimdallStorage.editDepositFee(_fee);
-        emit minWithdrawalAmountSet_event(msg.sender, oldFee, _fee);
+        emit depositFeeSet_event(msg.sender, oldFee, _fee);
     }
 
     function setWithdrawalFee(uint256 _fee) onlyOwner public {
         uint256 oldFee = heimdallStorage.loadWithdrawalFee();
         heimdallStorage.editWithdrawalFee(_fee);
-        emit minWithdrawalAmountSet_event(msg.sender, oldFee, _fee);
+        emit withdrawalFeeSet_event(msg.sender, oldFee, _fee);
     }
 
     function setMinWithdrawalAmount(uint256 _amount) onlyOwner public {
@@ -197,13 +206,13 @@ contract Heimdall is Owned{
     }
 
     /// events
-    event deposit_event(address owneraddress, address depositer, uint256 depositValue, uint256 endingValue, uint256 depositFeePaid, string toplAdrs);
+    event deposit_event(address ownerAddress, address depositer, uint256 depositValue, uint256 endingValue, uint256 depositFeePaid, string toplAdrs);
     event startedWithdrawal_event(address withdrawer, uint256 withdrawalAmount, uint256 endingValue, uint withdrawalFee);
-    event approvedWithdrawal_event(address owneraddress, address withdrawer, uint256 withdrawalAmount, uint256 endingValue, uint256 withdrawalFeePaid);
-    event deniedWithdrawal_event(address owneraddress, address withdrawer, uint256 withdrawalAmount);
-    event depositFeeSet_event(address owneraddress, uint256 oldFee, uint256 newFee);
-    event withdrawalFeeSet_event(address owneraddress, uint256 oldFee, uint256 newFee);
-    event minWithdrawalAmountSet_event(address owneraddress, uint256 oldAmount, uint256 newAmount);
+    event approvedWithdrawal_event(address ownerAddress, address withdrawer, uint256 withdrawalAmount, uint256 endingValue, uint256 withdrawalFeePaid);
+    event deniedWithdrawal_event(address ownerAddress, address withdrawer, uint256 withdrawalAmount);
+    event depositFeeSet_event(address ownerAddress, uint256 oldFee, uint256 newFee);
+    event withdrawalFeeSet_event(address ownerAddress, uint256 oldFee, uint256 newFee);
+    event minWithdrawalAmountSet_event(address ownerAddress, uint256 oldAmount, uint256 newAmount);
     event changedToplAddress_event(address ethAdrs, uint256 balance, string oldToplAdrs, string newToplAdrs);
     event changedEthAddress_event(string toplAdrs, uint256 balance, address oldEthAdrs, address newEthAdrs);
 }
