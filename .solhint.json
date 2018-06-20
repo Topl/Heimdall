@@ -1,3 +1,6 @@
 {
-  "extends": "default"
+  "extends": "default",
+  "rules": {
+    "func-name-mixedcase": false
+  }
 }
