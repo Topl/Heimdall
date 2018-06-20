@@ -32,13 +32,13 @@ contract Heimdall {
     function deposit(string memory _toplAdrs) public payable reqOpen {
         assert(msg.value.sub(depositFee) > 0); // no debt
         ownerBalance = ownerBalance.add(depositFee);
-        emit deposit_event(owner, msg.sender, msg.value, depositFee, _toplAdrs);
+        emit DepositEvent(owner, msg.sender, msg.value, depositFee, _toplAdrs);
     }
 
     function startWithdrawal(uint256 _amount) public reqOpen {
         assert(_amount.sub(withdrawalFee) > 0); // no debt
         withdrawals[msg.sender] = _amount;
-        emit startedWithdrawal_event(owner, msg.sender, _amount, withdrawalFee);
+        emit StartWithdrawalEvent(owner, msg.sender, _amount, withdrawalFee);
     }
 
     function approveWithdrawal(
@@ -49,22 +49,22 @@ contract Heimdall {
         withdrawals[_ethAdrs] = 0;
         ownerBalance = ownerBalance.add(_withdrawalFee);
         _ethAdrs.transfer(_amount.sub(_withdrawalFee));
-        emit approvedWithdrawal_event(owner, _ethAdrs, _amount, _withdrawalFee);
+        emit ApproveWithdrawalEvent(owner, _ethAdrs, _amount, _withdrawalFee);
     }
 
-    function denyWithdrawal(address _ethAdrs, uint256 _amount) public onlyOwner {
+    function denyWithdrawal(address _ethAdrs, uint256 _amount, uint256 _withdrawalFee) public onlyOwner {
         withdrawals[_ethAdrs] = 0;
-        emit deniedWithdrawal_event(owner, _ethAdrs, _amount, _withdrawalFee);
+        emit DeniedWithdrawalEvent(owner, _ethAdrs, _amount, _withdrawalFee);
     }
 
     function setDepositFee(uint256 _fee) public onlyOwner {
+        emit SetDepositFeeEvent(owner, depositFee, _fee);
         depositFee = _fee;
-        emit depositFeeSet_event(owner, oldFee, _fee);
     }
 
     function setWithdrawalFee(uint256 _fee) public onlyOwner {
+        emit SetWithdrawalFeeEvent(owner, withdrawalFee, _fee);
         withdrawalFee = _fee;
-        emit withdrawalFeeSet_event(owner, oldFee, _fee);
     }
 
     function ownerWithdrawal() public onlyOwner {
