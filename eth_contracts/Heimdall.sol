@@ -29,19 +29,19 @@ contract Heimdall {
         _;
     }
 
-    function Deposit(string memory _toplAdrs) public payable reqOpen {
+    function deposit(string memory _toplAdrs) public payable reqOpen {
         assert(msg.value.sub(depositFee) > 0); // no debt
         ownerBalance = ownerBalance.add(depositFee);
         emit deposit_event(owner, msg.sender, msg.value, depositFee, _toplAdrs);
     }
 
-    function StartWithdrawal(uint256 _amount) public reqOpen {
+    function startWithdrawal(uint256 _amount) public reqOpen {
         assert(_amount.sub(withdrawalFee) > 0); // no debt
         withdrawals[msg.sender] = _amount;
         emit startedWithdrawal_event(owner, msg.sender, _amount, withdrawalFee);
     }
 
-    function ApproveWithdrawal(
+    function approveWithdrawal(
         address _ethAdrs,
         uint256 _amount,
         uint256 _withdrawalFee
@@ -52,28 +52,28 @@ contract Heimdall {
         emit approvedWithdrawal_event(owner, _ethAdrs, _amount, _withdrawalFee);
     }
 
-    function DenyWithdrawal(address _ethAdrs, uint256 _amount) public onlyOwner {
+    function denyWithdrawal(address _ethAdrs, uint256 _amount) public onlyOwner {
         withdrawals[_ethAdrs] = 0;
         emit deniedWithdrawal_event(owner, _ethAdrs, _amount, _withdrawalFee);
     }
 
-    function SetDepositFee(uint256 _fee) public onlyOwner {
+    function setDepositFee(uint256 _fee) public onlyOwner {
         depositFee = _fee;
         emit depositFeeSet_event(owner, oldFee, _fee);
     }
 
-    function SetWithdrawalFee(uint256 _fee) public onlyOwner {
+    function setWithdrawalFee(uint256 _fee) public onlyOwner {
         withdrawalFee = _fee;
         emit withdrawalFeeSet_event(owner, oldFee, _fee);
     }
 
-    function OwnerWithdrawal() public onlyOwner {
+    function ownerWithdrawal() public onlyOwner {
         emit OwnerWithdrawalEvent(owner, ownerBalance);
         ownerBalance = 0;
         owner.transfer(ownerBalance);
     }
 
-    function ToggleContractOpen() public onlyOwner {
+    function toggleContractOpen() public onlyOwner {
         contractOpen = !contractOpen;
         emit ToggleContractOpenEvent(owner, !contractOpen, contractOpen);
     }
