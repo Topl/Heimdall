@@ -1,9 +1,11 @@
 pragma solidity 0.4.23;
 
+
 import "./SafeMath.sol";
 import "./Owned.sol";
 
-contract HeimdallStorage is Owned{
+
+contract HeimdallStorage is Owned {
 
     using SafeMath for uint256; // overflow checks
 
@@ -11,13 +13,13 @@ contract HeimdallStorage is Owned{
     address public currentMaster;
 
     /// structs
-    struct user {
+    struct User {
         string toplAdrs;
         uint256 balance;
     }
 
     /// storage vars
-    mapping(address => user) public users;
+    mapping(address => User) public users;
     mapping(address => uint256) public inProgress;
     uint256 public minWithdrawalAmount;
     uint256 public withdrawalFee;
@@ -34,50 +36,50 @@ contract HeimdallStorage is Owned{
         _;
     }
 
-    function changeMaster(address _newMaster) onlyOwner public {
+    function changeMaster(address _newMaster) public onlyOwner {
         currentMaster = _newMaster;
     }
 
     /// edit var functions
-    function editVar_users(address _ethAdrs, string _toplAdrs, uint256 _balance) fromMaster public {
+    function editVar_users(address _ethAdrs, string _toplAdrs, uint256 _balance) public fromMaster {
         users[_ethAdrs].toplAdrs = _toplAdrs;
         users[_ethAdrs].balance = _balance;
     }
 
-    function editVar_inProgress(address _ethAdrs, uint256 _amount) fromMaster public {
+    function editVar_inProgress(address _ethAdrs, uint256 _amount) public fromMaster {
         inProgress[_ethAdrs] = _amount;
     }
 
-    function editVar_minWithdrawalAmount(uint256 _minWithdrawalAmount) fromMaster public {
+    function editVar_minWithdrawalAmount(uint256 _minWithdrawalAmount) public fromMaster {
         minWithdrawalAmount = _minWithdrawalAmount;
     }
 
-    function editVar_withdrawalFee(uint256 _withdrawalFee) fromMaster public {
+    function editVar_withdrawalFee(uint256 _withdrawalFee) public fromMaster {
         withdrawalFee = _withdrawalFee;
     }
 
-    function editVar_depositFee(uint256 _depositFee) fromMaster public {
+    function editVar_depositFee(uint256 _depositFee) public fromMaster {
         depositFee = _depositFee;
     }
 
     /// load var functions
-    function loadVar_users_keyValue(address _ethAdrs) fromMaster view public returns(string memory, uint256){
+    function loadVar_users_keyValue(address _ethAdrs) public view fromMaster returns(string memory, uint256) {
         return (users[_ethAdrs].toplAdrs, users[_ethAdrs].balance);
     }
 
-    function loadVar_inProgress_keyValue(address _ethAdrs) fromMaster view public returns(uint256){
+    function loadVar_inProgress_keyValue(address _ethAdrs) public view fromMaster returns(uint256) {
         return inProgress[_ethAdrs];
     }
 
-    function loadVar_minWithdrawalAmount() fromMaster view public returns(uint256){
+    function loadVar_minWithdrawalAmount() public view fromMaster returns(uint256) {
         return minWithdrawalAmount;
     }
 
-    function loadVar_withdrawalFee() fromMaster view public returns(uint256){
+    function loadVar_withdrawalFee() public view fromMaster returns(uint256) {
         return withdrawalFee;
     }
 
-    function loadVar_depositFee() fromMaster view public returns(uint256){
+    function loadVar_depositFee() public view fromMaster returns(uint256) {
         return depositFee;
     }
 }
