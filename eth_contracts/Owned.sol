@@ -1,8 +1,9 @@
-pragma solidity 0.4.0;
+pragma solidity 0.4.23;
+
 
 contract Owned {
 
-    address owner;
+    address public owner;
 
     constructor() public {
         owner = msg.sender;
@@ -13,16 +14,11 @@ contract Owned {
         _;
     }
 
-    function newOwner(address _newOwner) onlyOwner public {
-        owner = _newOwner;
+    function terminate() external onlyOwner {
+        selfdestruct(owner);
     }
 
-    /// upgrades require you to call terminate on the old bifrost contract
-    /// this sends the ether to the owner
-    /// the owner has to then send the ether to the new contract
-    /// preferably via the constructor
-    /// if you have a better idea i'm all ears
-    function terminate() onlyOwner external {
-        selfdestruct(owner);
+    function newOwner(address _newOwner) public onlyOwner {
+        owner = _newOwner;
     }
 }
