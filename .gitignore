@@ -1,2 +1,4 @@
 .idea/
 eth_contracts/.DS_Store
+__pycache__/
+node_modules/

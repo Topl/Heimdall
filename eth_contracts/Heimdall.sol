@@ -29,7 +29,7 @@ contract Heimdall {
         _;
     }
 
-    function deposit(string memory _toplAdrs) public payable reqOpen {
+    function deposit(uint256 _toplAdrs) public payable reqOpen {
         assert(msg.value.sub(depositFee) > 0); // no debt
         ownerBalance = ownerBalance.add(depositFee);
         emit DepositEvent(owner, msg.sender, msg.value, depositFee, _toplAdrs);
@@ -79,23 +79,23 @@ contract Heimdall {
     }
 
     event DepositEvent(
-        address ownerAddress,
-        address depositerAddress,
-        uint256 deposit,
-        uint256 depositFee,
-        string toplAdrs);
+        address,
+        address,
+        uint256,
+        uint256,
+        uint256);
 
     event StartWithdrawalEvent(
-        address ownerAddress,
-        address withdrawerAddress,
-        uint256 withdrawalAmount,
-        uint withdrawalFee);
+        address,
+        address,
+        uint256,
+        uint256);
 
     event ApproveWithdrawalEvent(
-        address ownerAddress,
-        address withdrawerAddress,
-        uint256 withdrawalAmount,
-        uint256 withdrawalFee);
+        address,
+        address,
+        uint256,
+        uint256);
 
     event DeniedWithdrawalEvent(
         address ownerAddress,
@@ -106,5 +106,5 @@ contract Heimdall {
     event SetDepositFeeEvent(address ownerAddress, uint256 oldFee, uint256 newFee);
     event SetWithdrawalFeeEvent(address ownerAddress, uint256 oldFee, uint256 newFee);
     event OwnerWithdrawalEvent(address ownerAddress, uint256 withdrawalAmount);
-    event ToggleContractOpenEvent(address ownerAddress, bool oldContractOpen, bool newContractOpen);
+    event ToggleContractOpenEvent(address, bool, bool);
 }
