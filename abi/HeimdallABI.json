@@ -1,0 +1,411 @@
+[
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "toggleContractOpen",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_fee",
+				"type": "uint256"
+			}
+		],
+		"name": "setDepositFee",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_ethAdrs",
+				"type": "address"
+			},
+			{
+				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"name": "_withdrawalFee",
+				"type": "uint256"
+			}
+		],
+		"name": "denyWithdrawal",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "depositFee",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "withdrawals",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "withdrawalFee",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "contractOpen",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_toplAdrs",
+				"type": "string"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_fee",
+				"type": "uint256"
+			}
+		],
+		"name": "setWithdrawalFee",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "ownerBalance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "startWithdrawal",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "ownerWithdrawal",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_ethAdrs",
+				"type": "address"
+			},
+			{
+				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"name": "_withdrawalFee",
+				"type": "uint256"
+			}
+		],
+		"name": "approveWithdrawal",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "depositerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "deposit",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "depositFee",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "toplAdrs",
+				"type": "string"
+			}
+		],
+		"name": "DepositEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalFee",
+				"type": "uint256"
+			}
+		],
+		"name": "StartWithdrawalEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalFee",
+				"type": "uint256"
+			}
+		],
+		"name": "ApproveWithdrawalEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalFee",
+				"type": "uint256"
+			}
+		],
+		"name": "DeniedWithdrawalEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "oldFee",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "newFee",
+				"type": "uint256"
+			}
+		],
+		"name": "SetDepositFeeEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "oldFee",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "newFee",
+				"type": "uint256"
+			}
+		],
+		"name": "SetWithdrawalFeeEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "withdrawalAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "OwnerWithdrawalEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "oldContractOpen",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"name": "newContractOpen",
+				"type": "bool"
+			}
+		],
+		"name": "ToggleContractOpenEvent",
+		"type": "event"
+	}
+]
