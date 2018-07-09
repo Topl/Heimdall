@@ -54,7 +54,7 @@ contract Heimdall {
 
     function denyWithdrawal(address _ethAdrs, uint256 _amount, uint256 _withdrawalFee) public onlyOwner {
         withdrawals[_ethAdrs] = 0;
-        emit DeniedWithdrawalEvent(owner, _ethAdrs, _amount, _withdrawalFee);
+        emit DenyWithdrawalEvent(owner, _ethAdrs, _amount, _withdrawalFee);
     }
 
     function setDepositFee(uint256 _fee) public onlyOwner {
@@ -75,7 +75,6 @@ contract Heimdall {
 
     function toggleContractOpen() public onlyOwner {
         contractOpen = !contractOpen;
-        emit ToggleContractOpenEvent(owner, !contractOpen, contractOpen);
     }
 
     event DepositEvent(
@@ -97,13 +96,13 @@ contract Heimdall {
         uint256,
         uint256);
 
-    event DeniedWithdrawalEvent(
-        address ownerAddress,
-        address withdrawerAddress,
-        uint256 withdrawalAmount,
-        uint256 withdrawalFee);
+    event DenyWithdrawalEvent(
+        address,
+        address,
+        uint256,
+        uint256);
 
-    event SetDepositFeeEvent(address ownerAddress, uint256 oldFee, uint256 newFee);
+    event SetDepositFeeEvent(address, uint256, uint256);
     event SetWithdrawalFeeEvent(address ownerAddress, uint256 oldFee, uint256 newFee);
     event OwnerWithdrawalEvent(address ownerAddress, uint256 withdrawalAmount);
     event ToggleContractOpenEvent(address, bool, bool);
