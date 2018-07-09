@@ -1,1 +1,0 @@
-toggle_contract_open | {'ownerAddress': '000000000000000000000000189d77f276cb3fa82fd871beb66ddb849af7c889', 'old': False, 'new': True}

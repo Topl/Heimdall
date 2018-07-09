@@ -1,8 +1,8 @@
 from web3.auto import w3
 from SolcFunctions import *
 from ast import literal_eval
+from LogFunctions import *
 import time
-
 
 state_vars = {
     "contract_open": False,
@@ -103,21 +103,61 @@ def handle_deny_withdrawal_event(data, state_vars):
     return fields
 
 
+def handle_set_deposit_fee_event(data, state_vars):
+    fields = {
+        "ownerAddress": data[2:][:64],
+        "old": data[66:][:64],
+        "new": data[130:][:64]
+    }
+    write_log_line("set_deposit_fee_event | " + str(fields))
+    state_vars["deposit_fee"] = fields["new"]
+    state_vars["owner_address"] = fields["ownerAddress"]
+    return fields
+
+
+def handle_set_withdrawal_fee_event(data, state_vars):
+    fields = {
+        "ownerAddress": data[2:][:64],
+        "old": data[66:][:64],
+        "new": data[130:][:64]
+    }
+    write_log_line("set_withdrawal_fee_event | " + str(fields))
+    state_vars["withdrawal_fee"] = fields["new"]
+    state_vars["owner_address"] = fields["ownerAddress"]
+    return fields
+
+
 def main():
     abi = abi_heimdall()
     bytecode = bytecode_heimdall()
     print("connected:", w3.isConnected())
+    print("loading...")
     accounts = w3.eth.accounts
     w3.eth.defaultAccount = accounts[0]
-    print("deployment account:", w3.eth.defaultAccount)
     heimdall_contract = w3.eth.contract(abi=abi, bytecode=bytecode)
-    tx_hash_heimdall_deployment = heimdall_contract.constructor().transact()
-    tx_receipt_heimdall_deployment = w3.eth.waitForTransactionReceipt(tx_hash_heimdall_deployment)
-    heimdall_contract_address = tx_receipt_heimdall_deployment.contractAddress
+    with open("log.txt", "r") as f:
+        if f.read() == "new deploy":
+            tx_hash_heimdall_deployment = heimdall_contract.constructor().transact()
+            tx_receipt_heimdall_deployment = w3.eth.waitForTransactionReceipt(tx_hash_heimdall_deployment)
+            heimdall_contract_address = tx_receipt_heimdall_deployment.contractAddress
+            with open("log.txt", "w") as fw:
+                fw.write(heimdall_contract_address + "\n")
+        else:
+            f.seek(0)
+            heimdall_contract_address = f.read(42)
+            # load log data
+            f.seek(0)
+            for line in f.readlines()[1:]:
+                clean_line = line.strip("\n")
+                line_parts = line.split(" | ")
+                line_parts[1] = literal_eval(line_parts[1])
+                handle_log_line(line_parts, state_vars)
+    print("deployment account:", w3.eth.defaultAccount)
     print("contract deployed to:", heimdall_contract_address)
     heimdall_contract = w3.eth.contract(
         address=heimdall_contract_address,
         abi=abi,
+        bytecode=bytecode
     )
     # create event filters
     toggle_contract_open_event_hash = w3.sha3(text="ToggleContractOpenEvent(address,bool,bool)").hex()
@@ -145,13 +185,25 @@ def main():
         "address": heimdall_contract_address,
         "topics": [deny_withdrawal_event_hash]
     })
-    #
-    # LOAD STATE FROM LOGS HERE
-    #
+    set_deposit_fee_event_hash = w3.sha3(text="SetDepositFeeEvent(address,uint256,uint256)").hex()
+    set_deposit_fee_event_filter = w3.eth.filter(filter_params={
+        "address": heimdall_contract_address,
+        "topics": [set_deposit_fee_event_hash]
+    })
+    set_withdrawal_fee_event_hash = w3.sha3(text="SetWithdrawalFeeEvent(address,uint256,uint256)").hex()
+    set_withdrawal_fee_event_filter = w3.eth.filter(filter_params={
+        "address": heimdall_contract_address,
+        "topics": [set_withdrawal_fee_event_hash]
+    })
     try:
         while True:
+            print("\t--")
+            heimdall_contract.functions.toggleContractOpen().transact()
+            heimdall_contract.functions.setWithdrawalFee(50).transact()
+
             for event in toggle_contract_open_event_filter.get_new_entries():
                 handle_toggle_contract_open_event(event["data"], state_vars)
+                print("toggled", event)
             for event in deposit_event_filter.get_new_entries():
                 handle_deposit_event(event["data"], state_vars)
             for event in start_withdrawal_event_filter.get_new_entries():
@@ -160,6 +212,11 @@ def main():
                 handle_approve_withdrawal_event(event["data"], state_vars)
             for event in deny_withdrawal_event_filter.get_new_entries():
                 handle_deny_withdrawal_event(event["data"], state_vars)
+            for event in set_deposit_fee_event_filter.get_new_entries():
+                handle_set_deposit_fee_event(event["data"], state_vars)
+            for event in set_withdrawal_fee_event_filter.get_new_entries():
+                handle_set_withdrawal_fee_event(event["data"], state_vars)
+            # update topl data
             time.sleep(2)
     except:
         if state_vars["contract_open"]:
