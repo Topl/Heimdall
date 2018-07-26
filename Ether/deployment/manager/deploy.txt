@@ -1,0 +1,29 @@
+deployed
+
+Using network 'local_testnet'.
+
+Running migration: 1_initial_migration.js
+  Deploying Migrations...
+  ... 0xab6caeac00dc01aa02f61596a893703237993fb319433d8256b58d878d27c963
+  Migrations: 0xce1cccf8601dc9694bcb5d52ee6f75a6c7023039
+Saving successful migration to network...
+  ... 0x898a844fbaec869c95e6f4712544b1b6fcd78dbbc36bb4030b3b95da40e9ebbc
+Saving artifacts...
+Running migration: 2_deploy.js
+  Deploying Heimdall...
+  ... 0x6c4a5bf1ddf1a51a8929bd85168f38b7ab7552556db0b5fc5e0007b1dbedcacc
+  Heimdall: 0xa39be96376cdcd64821e47f938acc8d1547492db
+0xa39be96376cdcd64821e47f938acc8d1547492db
+[ '0xfbec6ea17a2665aa9ad06d0b4866b076d3a456fe',
+  '0xcedcbbcf9faf42819a7395b1464bb649ff7207ab',
+  '0x3bf733f33eeb6316a0b50258f3f97c3281ca6c19',
+  '0x91f49dea31c6a33966cba2d51f7381ab3a10f741',
+  '0xbeada495a3fea9688a0ba3dce672d2935e334b55',
+  '0xbef9f01e2a6b8dd8b114db9b53833550bbd0e52b',
+  '0x124cfbfca063e3af99dd6d9539c6720942e6a0b8',
+  '0x04ccfae7e2b82e0325367fb37a00071cc5251893',
+  '0xb6d0f71798fa62e044aa93c86a9b218415284ab3',
+  '0x4c35f86a8a07dd6caf1d2b422fa91466ead820d4' ]
+Saving successful migration to network...
+  ... 0x3fb8d73b71ce37a7762d31222db987a3b05cd05699541d1b132a1725a409bb7e
+Saving artifacts...
