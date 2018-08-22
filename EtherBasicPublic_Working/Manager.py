@@ -1,4 +1,4 @@
-from EtherBasic_Working import abi
+from EtherBasicLocal_Working import abi
 import requests
 import sys
 import time
@@ -178,7 +178,7 @@ if ipc_path != "TEST":
     print("\nCurrently this program assumes your Heimdallr contract is already deployed.")
     print("This is planned to change in a future update adding a SmartDeploy feature.")
     print("The exact source code of the contract you are expected to have deployed can be found here:"
-          " https://github.com/Topl/Heimdallr/blob/master/EtherBasic_Working/SoliditySrc/send_me_money.sol")
+          " https://github.com/Topl/Heimdallr/blob/master/EtherBasicLocal_Working/SoliditySrc/send_me_money.sol")
     print("Unless you'd like to wait till then, please enter the address of your ALREADY DEPLOYED contract.\n")
     contract_address = input("CONTRACT ADDRESS: ")
     print("\nPlease enter the public key of the Ethereum account you'd like to use.")
@@ -204,14 +204,14 @@ if ipc_path != "TEST":
           " that has already been used before?\n")
     new_instance = input("INSTANCE TYPE ('new' or 'old'): ")
 else:  # testing defaults
-    ipc_path = "FILL HERE"
-    contract_address = "FILL HERE"
-    manager_ethereum_public_key = "FILL HERE"
-    manager_ethereum_private_key = "FILL HERE"
-    manager_topl_public_key = "FILL HERE"
-    manager_topl_public_key_password = "FILL HERE"
-    black_hole_address = "FILL HERE"
-    new_instance = 'FILL HERE'
+    ipc_path = "/Users/alex.bruns/Library/Ethereum/rinkeby"
+    contract_address = "0x277d87256992845b30f6df9006165bda7a58edb2"
+    manager_ethereum_public_key = "0xc2f41f89adf2af03a0c65ee62c925f6bb20a1282"
+    manager_ethereum_private_key = "972FEC064AAB0B7BCC58006ABB8BBEC0CB727FFF2D836EF937F7B667F16C634B"
+    manager_topl_public_key = "8ExiD1vEj5kRUdmoJpQ9XKfuNC51TSHaPNWXyMqjYfKZ"
+    manager_topl_public_key_password = "a"
+    black_hole_address = "222222222222333322223333222233332222333322223333"
+    new_instance = 'old'
 if new_instance == 'new':
     new_instance = True
 else:
