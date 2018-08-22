@@ -7,7 +7,7 @@ contract send_me_money {
         owner = msg.sender;
     }
 
-    function take(uint256 _v) public payable {
+    function take(string _v) public payable {
         emit t(msg.sender, msg.value, _v);
     }
 
@@ -22,7 +22,7 @@ contract send_me_money {
         owner = _a;
     }
 
-    event t(address sender, uint256 amount, uint256 receiver);
+    event t(address sender, uint256 amount, string receiver);
     event g(address receiver, uint256 amount);
 }
 

@@ -5,6 +5,34 @@ ContractABI = [
             {
                 "name": "_a",
                 "type": "address"
+            }
+        ],
+        "name": "new_owner",
+        "outputs": [],
+        "payable": False,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": False,
+        "inputs": [
+            {
+                "name": "_v",
+                "type": "string"
+            }
+        ],
+        "name": "take",
+        "outputs": [],
+        "payable": True,
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "constant": False,
+        "inputs": [
+            {
+                "name": "_a",
+                "type": "address"
             },
             {
                 "name": "_v",
@@ -18,18 +46,10 @@ ContractABI = [
         "type": "function"
     },
     {
-        "constant": False,
-        "inputs": [
-            {
-                "name": "_a",
-                "type": "address"
-            }
-        ],
-        "name": "new_owner",
-        "outputs": [],
+        "inputs": [],
         "payable": False,
         "stateMutability": "nonpayable",
-        "type": "function"
+        "type": "constructor"
     },
     {
         "anonymous": False,
@@ -47,7 +67,7 @@ ContractABI = [
             {
                 "indexed": False,
                 "name": "receiver",
-                "type": "uint256"
+                "type": "string"
             }
         ],
         "name": "t",
@@ -69,25 +89,5 @@ ContractABI = [
         ],
         "name": "g",
         "type": "event"
-    },
-    {
-        "constant": False,
-        "inputs": [
-            {
-                "name": "_v",
-                "type": "uint256"
-            }
-        ],
-        "name": "take",
-        "outputs": [],
-        "payable": True,
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "payable": False,
-        "stateMutability": "nonpayable",
-        "type": "constructor"
     }
 ]
