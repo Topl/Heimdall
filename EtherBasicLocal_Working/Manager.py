@@ -116,7 +116,7 @@ def main():
                 to_do_events.append(e)
     else:
         to_do_events = []
-        topl_blocks = requests.get("http://localhost:9585/debug/chain").json()["data"]["history"].split(",")[::-1]
+        topl_blocks = requests.get("http://localhost:9085/debug/chain").json()["data"]["history"].split(",")[::-1]
 
 
     # EVENT LOOP
@@ -129,10 +129,10 @@ def main():
         for e in to_do_events:
             print("event:", e)  # print out event
             tx_hashes.append(event_handler(e))  # handle each event
-        block_ids = requests.get("http://localhost:9585/debug/chain").json()["data"]["history"].split(",")[::-1]
+        block_ids = requests.get("http://localhost:9085/debug/chain").json()["data"]["history"].split(",")[::-1]
         for block_id in block_ids:
             if block_id not in topl_blocks:
-                block_txs = requests.get("http://localhost:9585/nodeView/persistentModifier/" + block_id).json()["data"]["txs"]
+                block_txs = requests.get("http://localhost:9085/nodeView/persistentModifier/" + block_id).json()["data"]["txs"]
                 for tx in block_txs:
                     if tx.get("assetCode", "") == "wei" and tx.get("hub", "") == manager_topl_public_key and tx["id"] not in tx_hashes:  # new, wei, and from me
                         for prop in tx["to"]:
@@ -167,7 +167,7 @@ def main():
 #
 
 # GLOBAL SETUP
-client = HTTPClient("http://localhost:9585/asset/")
+client = HTTPClient("http://localhost:9085/asset/")
 
 # USER INPUT
 print("\nDefaults must be set in the source code before this option can be chosen.")
