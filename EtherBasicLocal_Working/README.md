@@ -31,4 +31,4 @@ To send wei to the take function of your contract (AKA send wei to the Topl bloc
 
 Where it say INSERT TOPL ADDRESS put your Topl address in double-quotes instead. Where it says AMOUNT put the amount of wei you'd like to send instead.
 ### Sending wei assets to Ethereum
-IN PROGRESS
+To send wei assets to Ethereum (AKA redeem your wei assets for actual wei) you must issue an asset transfer transaction to the black hole address you specified in your manager setup (if you followed directions it will be 22222222222222222222222222222222222222222222).
