@@ -1,0 +1,19 @@
+pip install web3
+pip install "jsonrpcclient[requests]"
+
+
+had to change Eth port and Topl port
+maybe had to disable the poa line
+currently not working with webpy 4.6 (does work with 4.5)
+bug in getting the nonce value for the ethereum owner account
+
+
+
+open a new window to start the manager. Once manager is started
+
+truffle console
+send_me_money.deployed().then(instance => {con = instance})
+
+con.take("EDCTtMsuQvECFZBuHr65vkqmaEgcwc9Bvx3wfT2Umabs",{from: web3.eth.accounts[2], value: 1e18, gas: 100000})
+con.take("EDCTtMsuQvECFZBuHr65vkqmaEgcwc9Bvx3wfT2Umabs",{from: web3.eth.accounts[2], value: 100000, gas: 100000})
+con.new_owner(web3.eth.accounts[0], {from: web3.eth.accounts[1], gas: 100000})

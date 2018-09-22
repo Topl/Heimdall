@@ -1,8 +1,8 @@
-from EtherBasicLocal_Working import abi
+import abi
 import requests
 import sys
 import time
-from jsonrpcclient.http_client import HTTPClient
+from jsonrpcclient.clients.http_client import HTTPClient
 import logging
 from web3 import Web3
 from web3 import Account
@@ -77,13 +77,14 @@ def give_event_handler(event):
 
 def main():
     # WEB3 SETUP
-    w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
-    w3.middleware_stack.inject(geth_poa_middleware, layer=0)
+    w3 = Web3(Web3.HTTPProvider('http://localhost:7545'))
+    print("The Manager is connected to the local testnet\n") if w3.isConnected() else sys.exit("The Manager did not attach to the local testnet")
+    #w3.middleware_stack.inject(geth_poa_middleware, layer=0)
     w3.eth.defaultAccount = Account.privateKeyToAccount(manager_ethereum_private_key)
-    start_block = 2500000  # can move this up if you are starting far in the future
+    #start_block = 2500000  # can move this up if you are starting far in the future
 
     # UNLOCK KEYFILE
-    requests.post("http://localhost:9585/wallet/unlock",
+    requests.post("http://localhost:9085/wallet/unlock",
                   headers={"Accept": "application/json", "Content-Type": "application/json"},
                   json={"password": manager_topl_public_key_password,
                         "publicKey": manager_topl_public_key}).json()
@@ -96,8 +97,8 @@ def main():
     contract = w3.eth.contract(address=w3.toChecksumAddress(contract_address), abi=abi.ContractABI)
 
     # LOGS SETUP
-    t_event = contract.events.t.createFilter(fromBlock=2800000)
-    g_event = contract.events.g.createFilter(fromBlock=2800000)
+    t_event = contract.events.t.createFilter(fromBlock=0)
+    g_event = contract.events.g.createFilter(fromBlock=0)
 
     # HISTORICAL SETUP
     tx_hashes = []
@@ -139,14 +140,14 @@ def main():
                             if prop["proposition"] == black_hole_address:  # burn box
                                 print("Wei burned!")
                                 print(tx)
-                                nonce = w3.eth.getTransactionCount(w3.toChecksumAddress(manager_topl_public_key_password))
+                                nonce = w3.eth.getTransactionCount(w3.toChecksumAddress(manager_ethereum_public_key))
                                 w3.eth.sendRawTransaction(w3
                                                           .eth
                                                           .account
                                                           .signTransaction(contract
                                                                            .functions
                                                                            .give(w3.toChecksumAddress(tx["data"]), int(prop["value"]))
-                                                                           .buildTransaction({"chainId": 4, "gas": 100000, "gasPrice": w3.toWei('5', 'gwei'), "nonce": nonce}),
+                                                                           .buildTransaction({"chainId": 5777, "gas": 100000, "gasPrice": w3.toWei('5', 'gwei'), "nonce": nonce}),
                                                                            manager_ethereum_private_key)
                                                           .rawTransaction)  # send that SH*T
                                 tx_hashes.append(tx["id"])
@@ -203,14 +204,14 @@ if defaults == "n":
           " that has already been used before?\n")
     new_instance = input("INSTANCE TYPE ('new' or 'old'): ")
 else:  # testing defaults
-    contract_address = "FILL HERE"
-    manager_ethereum_public_key = "FILL HERE"
-    manager_ethereum_private_key = "FILL HERE"
-    manager_topl_public_key = "FILL HERE"
-    manager_topl_public_key_password = "FILL HERE"
-    black_hole_address = "FILL HERE"
-    new_instance = 'FILL HERE'
-if new_instance == 'new':
+    contract_address = "0x49e80425fb0696c642bd840e87a8aac0847f65a7"
+    manager_ethereum_public_key = "0x5B12A6a70300B5A0734742845aC4f5a366f7997C"
+    manager_ethereum_private_key = "1610002447a325188582c4e366892ecc200cef4dec7a37190807b1544e425dc5"
+    manager_topl_public_key = "6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ"
+    manager_topl_public_key_password = "genesis"
+    black_hole_address = "22222222222222222222222222222222222222222222"
+    new_instance = 'new'
+if new_instance == 'old':
     new_instance = True
 else:
     new_instance = False
